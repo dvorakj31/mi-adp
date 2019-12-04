@@ -6,4 +6,6 @@ public interface IGameGraphics {
     void drawImage(String path, Position pos);
     void drawText(String text, Position pos);
     void drawRectangle(Position leftTop, Position rightBottom);
+
+    void clearRect(int i, int i1, int maxX, int maxY);
 }

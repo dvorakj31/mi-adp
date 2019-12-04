@@ -20,11 +20,16 @@ public class JavaFxGraphics implements IGameGraphicsImplementor {
 
     @Override
     public void drawText(String text, Position pos) {
-
+        this.gc.fillText(text, pos.getX(), pos.getY());
     }
 
     @Override
     public void drawRectangle(Position leftTop, Position rightBottom) {
 
+    }
+
+    @Override
+    public void clearRect(int i, int i1, int maxX, int maxY) {
+        this.gc.clearRect(i, i1, maxX, maxY);
     }
 }
