@@ -8,12 +8,8 @@ public class MoveCannonDownCommand extends AbstractGameCommand {
     }
 
     @Override
-    public void execute() {
+    void execute() {
         this.model.moveCannonDown();
     }
 
-    @Override
-    public void unexecute() {
-
-    }
 }

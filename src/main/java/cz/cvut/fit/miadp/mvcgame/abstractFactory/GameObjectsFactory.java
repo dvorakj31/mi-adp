@@ -28,7 +28,7 @@ public class GameObjectsFactory implements IGameObjectsFactory {
     @Override
     public AbstractEnemy createEnemy() {
         int posY = r.nextInt(MvcGameConfig.MAX_Y);
-        int posX = this.model.getCannon().getX() * 2 + r.nextInt(MvcGameConfig.MAX_Y - (this.model.getCannon().getX() * 2));
+        int posX = this.model.getCannon().getPosX() * 2 + r.nextInt(MvcGameConfig.MAX_Y - (this.model.getCannon().getPosX() * 2));
         return new Enemy(posX, posY);
     }
 
@@ -40,7 +40,7 @@ public class GameObjectsFactory implements IGameObjectsFactory {
     @Override
     public AbstractMissile createMissile() {
         AbstractCannon cannon = this.model.getCannon();
-        return new Missile(cannon.getX(), cannon.getY());
+        return new Missile(cannon.getPosX(), cannon.getPosY());
     }
 
     @Override

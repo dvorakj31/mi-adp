@@ -4,8 +4,10 @@ import cz.cvut.fit.miadp.mvcgame.command.AbstractGameCommand;
 import cz.cvut.fit.miadp.mvcgame.observer.IObserver;
 import cz.cvut.fit.miadp.mvcgame.strategy.IMovingStrategy;
 
+import java.util.ArrayList;
+
 public interface IGameModel {
-    void getGameObjects();
+    ArrayList<GameObject> getGameObjects();
     void moveCannonUp();
     void moveCannonDown();
     void cannonShoot();

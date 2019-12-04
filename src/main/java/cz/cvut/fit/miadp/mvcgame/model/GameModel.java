@@ -4,6 +4,7 @@ import cz.cvut.fit.miadp.mvcgame.abstractFactory.GameObjectsFactory;
 import cz.cvut.fit.miadp.mvcgame.abstractFactory.IGameObjectsFactory;
 import cz.cvut.fit.miadp.mvcgame.command.AbstractGameCommand;
 import cz.cvut.fit.miadp.mvcgame.config.MvcGameConfig;
+import cz.cvut.fit.miadp.mvcgame.controller.GameController;
 import cz.cvut.fit.miadp.mvcgame.model.gameModels.*;
 import cz.cvut.fit.miadp.mvcgame.observer.IObservable;
 import cz.cvut.fit.miadp.mvcgame.observer.IObserver;
@@ -29,6 +30,7 @@ public class GameModel implements IObservable, IGameModel {
     private IGameObjectsFactory goFactory;
     private LinkedBlockingQueue<AbstractGameCommand> unexecutedCmds = new LinkedBlockingQueue<>();
     private Stack<AbstractGameCommand> executedCmds = new Stack<>();
+
 
     public ArrayList<AbstractMissile> getMissiles() {
         return this.missiles;
@@ -89,19 +91,24 @@ public class GameModel implements IObservable, IGameModel {
 
 
     @Override
-    public void getGameObjects() {
-
+    public ArrayList<GameObject> getGameObjects() {
+        ArrayList<GameObject> ret = new ArrayList<>();
+        ret.add(this.cannon);
+        ret.addAll(this.enemies);
+        ret.addAll(this.missiles);
+        ret.addAll(this.collisions);
+        return ret;
     }
 
     @Override
     public void moveCannonUp() {
-        this.cannon.setY(this.cannon.getY() - MvcGameConfig.MOVE_SPEED);
+        this.cannon.setY(this.cannon.getPosY() - MvcGameConfig.MOVE_SPEED);
         this.notifyMyObservers();
     }
 
     @Override
     public void moveCannonDown() {
-        this.cannon.setY(this.cannon.getY() + MvcGameConfig.MOVE_SPEED);
+        this.cannon.setY(this.cannon.getPosY() + MvcGameConfig.MOVE_SPEED);
         this.notifyMyObservers();
     }
 
@@ -109,6 +116,7 @@ public class GameModel implements IObservable, IGameModel {
     public void cannonShoot() {
         AbstractMissile missile = this.goFactory.createMissile();
         this.missiles.add(missile);
+        this.notifyMyObservers();
     }
 
     @Override
@@ -118,7 +126,6 @@ public class GameModel implements IObservable, IGameModel {
 
     @Override
     public void registerObserver(IObserver obs) {
-        if (!this.observers.contains(obs))
             this.observers.add(obs);
     }
 
@@ -149,7 +156,6 @@ public class GameModel implements IObservable, IGameModel {
 
     @Override
     public void registerCommand(AbstractGameCommand cmd) {
-        //if(!(cmd instanceof UndoCommand)) TODO
         this.unexecutedCmds.add(cmd);
     }
 
@@ -158,7 +164,6 @@ public class GameModel implements IObservable, IGameModel {
         try {
             AbstractGameCommand cmd = this.executedCmds.pop();
             cmd.unexecute();
-
         } catch (Exception e) {
 
         }
@@ -179,6 +184,8 @@ public class GameModel implements IObservable, IGameModel {
         this.moveMissiles();
         this.checkCollisions();
         this.removeInvisible();
+
+        this.notifyMyObservers();
     }
 
     private void checkCollisions() {
@@ -210,11 +217,19 @@ public class GameModel implements IObservable, IGameModel {
                 missilesToRemove.add(m);
         }
         this.missiles.removeAll(missilesToRemove);
+
+        ArrayList<AbstractCollision> collisionsToRemove = new ArrayList<>();
+        for(AbstractCollision collision: this.collisions) {
+            if (collision.getAge() > MvcGameConfig.COLLISION_LIFETIME)
+                collisionsToRemove.add(collision);
+        }
+
+        this.collisions.removeAll(collisionsToRemove);
     }
 
     private void moveMissiles() {
-        for (AbstractMissile m: this.missiles) {
-            m.move();
+        for (int i = 0; i < this.missiles.size(); i++) {
+            this.missiles.get(i).move();
         }
     }
 
@@ -223,7 +238,7 @@ public class GameModel implements IObservable, IGameModel {
         while(!this.unexecutedCmds.isEmpty()) {
             AbstractGameCommand cmd = unexecutedCmds.poll();
             this.executedCmds.push(cmd);
-            cmd.execute();
+            cmd.doExecute();
         }
     }
 

@@ -10,7 +10,14 @@ public abstract class AbstractGameCommand {
         this.model = model;
     }
 
-    public abstract void execute();
+    public void doExecute() {
+        this.memento = this.model.createMemento();
+        this.execute();
+    }
 
-    public abstract void unexecute();
+    abstract void execute();
+
+    public void unexecute() {
+        this.model.setMemento(memento);
+    }
 }

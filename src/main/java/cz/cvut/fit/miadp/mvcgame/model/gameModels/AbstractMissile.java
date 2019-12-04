@@ -2,6 +2,7 @@ package cz.cvut.fit.miadp.mvcgame.model.gameModels;
 
 import cz.cvut.fit.miadp.mvcgame.config.MvcGameConfig;
 import cz.cvut.fit.miadp.mvcgame.model.GameObject;
+import cz.cvut.fit.miadp.mvcgame.visitor.IVisitor;
 
 public abstract class AbstractMissile extends GameObject {
     public AbstractMissile(int x, int y) {
@@ -10,16 +11,12 @@ public abstract class AbstractMissile extends GameObject {
     }
     public abstract void move();
     public boolean collide(AbstractEnemy enemy) {
-        boolean bCollides = true;
-        int aX = this.posX;
-        int aY = this.posY;
-        int bX = enemy.getPosX();
-        int bY = enemy.getPosY();
+        return (Math.abs(this.posX - enemy.getPosX()) < MvcGameConfig.COLLISION_DIVERGENCE) &&
+                (Math.abs(this.posY - enemy.getPosY()) < MvcGameConfig.COLLISION_DIVERGENCE);
+    }
 
-        //GameConfig.COLLIDE_FACTOR;
-        bCollides = bCollides && (Math.abs(aX - bX) < MvcGameConfig.COLLISION_DIVERGENCE);
-        bCollides = bCollides && (Math.abs(aY - bY) < MvcGameConfig.COLLISION_DIVERGENCE);
-
-        return bCollides;
+    @Override
+    public void acceptVisitor(IVisitor visitor) {
+        visitor.visitMissile(this);
     }
 }

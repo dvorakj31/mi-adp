@@ -72,7 +72,6 @@ public class MvcGameJavaFxLauncher extends Application {
             }
         );
 
-        theMvcGame.setGraphics(gr);
         // the game-loop
         new AnimationTimer()
         {
@@ -82,8 +81,8 @@ public class MvcGameJavaFxLauncher extends Application {
                  // gc.clearRect(0, 0, winWidth, winHeigth);
 
                 theMvcGame.processPressedKeys(pressedKeysCodes);
-//                theMvcGame.update();
-                theMvcGame.render();
+                theMvcGame.update();
+                theMvcGame.render(gr);
             }
         }.start();
             

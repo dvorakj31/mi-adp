@@ -7,8 +7,8 @@ public class MvcGameConfig
     public static final int INIT_CANNON_X = 280;
     public static final int INIT_CANNON_Y = 20;
     public static final int MOVE_SPEED = 10;
-    public static final int TIME_TICK = 30;
+    public static final int TIME_TICK = 20;
     public static final int MAX_ENEMIES = 20;
-    public static final int COLLISION_DIVERGENCE = 10;
-
+    public static final int COLLISION_DIVERGENCE = 25;
+    public static final int COLLISION_LIFETIME = 2000;
 }

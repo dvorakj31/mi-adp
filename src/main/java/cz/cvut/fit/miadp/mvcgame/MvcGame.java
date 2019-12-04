@@ -34,19 +34,16 @@ public class MvcGame
             this.controller.onKeyPress(code);
     }
 
-//    public void update()
-//    {
-//        this.model.update();
-//    }
-
-    public void setGraphics(IGameGraphics gr) {
-        this.view.setGraphics(gr);
+    public void update()
+    {
+        this.model.timeTick();
     }
 
-    public void render()
+    public void render(IGameGraphics gr)
     {
 //        gr.drawImage(new Image("images/cannon.png"), logoPos.getX(), logoPos.getY());
-        this.view.update();
+        this.view.setGraphics(gr);
+        this.view.render();
     }
 
     public String getWindowTitle()

@@ -8,12 +8,8 @@ public class ShootMissileCommand extends AbstractGameCommand {
     }
 
     @Override
-    public void execute() {
+    void execute() {
         this.model.cannonShoot();
     }
 
-    @Override
-    public void unexecute() {
-
-    }
 }

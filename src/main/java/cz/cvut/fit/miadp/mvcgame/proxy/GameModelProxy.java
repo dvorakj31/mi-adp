@@ -1,9 +1,12 @@
 package cz.cvut.fit.miadp.mvcgame.proxy;
 
 import cz.cvut.fit.miadp.mvcgame.command.AbstractGameCommand;
+import cz.cvut.fit.miadp.mvcgame.model.GameObject;
 import cz.cvut.fit.miadp.mvcgame.model.IGameModel;
 import cz.cvut.fit.miadp.mvcgame.observer.IObserver;
 import cz.cvut.fit.miadp.mvcgame.strategy.IMovingStrategy;
+
+import java.util.ArrayList;
 
 public class GameModelProxy implements IGameModel {
 
@@ -14,8 +17,8 @@ public class GameModelProxy implements IGameModel {
     }
 
     @Override
-    public void getGameObjects() {
-        this.model.getGameObjects();
+    public ArrayList<GameObject> getGameObjects() {
+        return this.model.getGameObjects();
     }
 
     @Override
