@@ -15,11 +15,15 @@ public class DoubleShootingMode implements IShootingMode {
     public ArrayList<AbstractMissile> shoot(AbstractCannon cannon) {
         ArrayList<AbstractMissile> missiles = new ArrayList<>();
         cannon.aimUp();
+        cannon.aimUp();
         missiles.add(cannon.simpleShot());
+        cannon.aimDown();
         cannon.aimDown();
 
         cannon.aimDown();
+        cannon.aimDown();
         missiles.add(cannon.simpleShot());
+        cannon.aimUp();
         cannon.aimUp();
 
         return missiles;

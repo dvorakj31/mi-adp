@@ -8,8 +8,8 @@ public class SimpleMoveStrategy implements IMovingStrategy {
     @Override
     public Position updatePosition(Position pos, float power, float angle, long lifetime) {
         Position ret = new Position();
-        ret.setX((int)(pos.getX() + (power * Math.cos(angle))));
-        ret.setY((int)(pos.getY() + (power * Math.sin(angle))));
+        ret.setX((int)(pos.getX() + (power * 3 * Math.cos(angle))));
+        ret.setY((int)(pos.getY() + (power * 3 * Math.sin(angle))));
         return ret;
     }
 
