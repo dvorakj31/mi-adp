@@ -10,7 +10,9 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BackgroundImage;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -40,7 +42,6 @@ public class MvcGameJavaFxLauncher extends Application {
             
         Canvas canvas = new Canvas( winWidth, winHeigth );
         root.getChildren().add( canvas );
-            
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         IGameGraphics gr = new GameGraphics(new JavaFxGraphics(gc));

@@ -8,10 +8,11 @@ import cz.cvut.fit.miadp.mvcgame.config.MvcGameConfig;
 import cz.cvut.fit.miadp.mvcgame.model.gameModels.*;
 import cz.cvut.fit.miadp.mvcgame.observer.IObservable;
 import cz.cvut.fit.miadp.mvcgame.observer.IObserver;
+import cz.cvut.fit.miadp.mvcgame.sound.SoundPlayer;
+import cz.cvut.fit.miadp.mvcgame.sound.SoundType;
 import cz.cvut.fit.miadp.mvcgame.state.IShootingMode;
 import cz.cvut.fit.miadp.mvcgame.state.SimpleShootingMode;
 import cz.cvut.fit.miadp.mvcgame.strategy.IMovingStrategy;
-import cz.cvut.fit.miadp.mvcgame.strategy.RealisticMoveStrategy;
 import cz.cvut.fit.miadp.mvcgame.strategy.SimpleMoveStrategy;
 
 import java.util.*;
@@ -110,7 +111,9 @@ public class GameModel implements IObservable, IGameModel {
     @Override
     public void cannonShoot() {
         this.missiles.addAll(this.cannon.shoot());
+        SoundPlayer.playSound(SoundType.SHOOT_SOUND);
         this.notifyMyObservers();
+        SoundPlayer.playSound(SoundType.FLY_SOUND);
     }
 
     @Override
@@ -215,7 +218,7 @@ public class GameModel implements IObservable, IGameModel {
         }
     }
 
-    private void moveGameObjects() {
+    void moveGameObjects() {
         this.moveMissiles();
         this.checkCollisions();
         this.removeInvisible();
@@ -223,7 +226,7 @@ public class GameModel implements IObservable, IGameModel {
         this.notifyMyObservers();
     }
 
-    private void checkCollisions() {
+    void checkCollisions() {
         ArrayList<AbstractMissile> collidedMissiles = new ArrayList<>();
         ArrayList<AbstractEnemy> collidedEnemies = new ArrayList<>();
         for(int i = 0; i < missiles.size(); i++) {
@@ -235,7 +238,8 @@ public class GameModel implements IObservable, IGameModel {
                 }
             }
         }
-
+        if (!collidedEnemies.isEmpty())
+            SoundPlayer.playSound(SoundType.EXPLOSION_SOUND);
         for (AbstractEnemy enemy : collidedEnemies) {
             this.collisions.add(this.goFactory.createCollision(enemy.posX, enemy.posY));
         }
@@ -244,7 +248,7 @@ public class GameModel implements IObservable, IGameModel {
 
     }
 
-    private void removeInvisible() {
+    void removeInvisible() {
         ArrayList<AbstractMissile> missilesToRemove = new ArrayList<>();
         for(AbstractMissile m: this.missiles) {
             if (m.getPosX() < 0 || m.getPosX() > MvcGameConfig.MAX_X ||
@@ -262,7 +266,7 @@ public class GameModel implements IObservable, IGameModel {
         this.collisions.removeAll(collisionsToRemove);
     }
 
-    private void moveMissiles() {
+    void moveMissiles() {
         for (int i = 0; i < this.missiles.size(); i++) {
             this.missiles.get(i).move();
         }

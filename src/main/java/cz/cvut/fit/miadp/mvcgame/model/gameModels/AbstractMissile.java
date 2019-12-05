@@ -27,8 +27,8 @@ public abstract class AbstractMissile extends LifetimeLimitedGO {
     }
 
     public boolean collide(AbstractEnemy enemy) {
-        return (Math.abs(this.posX - enemy.getPosX()) < MvcGameConfig.COLLISION_DIVERGENCE) &&
-                (Math.abs(this.posY - enemy.getPosY()) < MvcGameConfig.COLLISION_DIVERGENCE);
+        return (Math.abs(this.getPosX() - enemy.getPosX()) < MvcGameConfig.COLLISION_DIVERGENCE) &&
+                (Math.abs(this.getPosY() - enemy.getPosY()) < MvcGameConfig.COLLISION_DIVERGENCE);
     }
 
     @Override
