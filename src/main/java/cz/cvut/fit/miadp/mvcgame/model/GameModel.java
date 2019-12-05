@@ -41,13 +41,15 @@ public class GameModel implements IObservable, IGameModel {
         private int score;
         private AbstractCannon cannon;
         private ArrayList<AbstractEnemy> enemies;
+        private ArrayList<AbstractCollision> collisions;
         private IMovingStrategy strategy;
 
-        Memento(int score, AbstractCannon cannon, ArrayList<AbstractEnemy> enemies,
+        Memento(int score, AbstractCannon cannon, ArrayList<AbstractEnemy> enemies, ArrayList<AbstractCollision> collisions,
                 IMovingStrategy strategy, AbstractGameInfo info) {
             this.score = score;
             this.cannon = cannon;
             this.enemies = enemies;
+            this.collisions = collisions;
             this.strategy = strategy;
             this.info = info;
         }
@@ -168,6 +170,8 @@ public class GameModel implements IObservable, IGameModel {
         this.score = m.score;
         this.strategy = m.strategy;
         this.enemies = m.enemies;
+        this.collisions = m.collisions;
+        this.info = m.info;
         this.cannon = m.cannon;
     }
 
@@ -176,9 +180,13 @@ public class GameModel implements IObservable, IGameModel {
         try {
 
             ArrayList<AbstractEnemy> cloned_enemies = new ArrayList<>();
+            ArrayList<AbstractCollision> cloned_collisions = new ArrayList<>();
             for(int i = 0; i < this.enemies.size(); i++)
                 cloned_enemies.add((AbstractEnemy)this.enemies.get(i).clone());
-            return new Memento(this.score, (AbstractCannon)this.cannon.clone(), cloned_enemies, this.strategy,
+            for(int i = 0; i < this.collisions.size(); i++) {
+                cloned_collisions.add((AbstractCollision)this.collisions.get(i).clone());
+            }
+            return new Memento(this.score, (AbstractCannon)this.cannon.clone(), cloned_enemies, cloned_collisions, this.strategy,
                     (AbstractGameInfo)this.info.clone());
         } catch(CloneNotSupportedException c) {
             return null;
