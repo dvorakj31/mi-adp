@@ -1,5 +1,6 @@
 package cz.cvut.fit.miadp.mvcgame.command;
 
+import cz.cvut.fit.miadp.mvcgame.model.GameModel;
 import cz.cvut.fit.miadp.mvcgame.model.IGameModel;
 
 public abstract class AbstractGameCommand {

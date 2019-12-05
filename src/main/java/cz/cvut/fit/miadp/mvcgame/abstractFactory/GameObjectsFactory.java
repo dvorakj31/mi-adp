@@ -22,13 +22,16 @@ public class GameObjectsFactory implements IGameObjectsFactory {
 
     @Override
     public AbstractCannon createCannon() {
-        return new Cannon();
+        AbstractCannon cannon = new Cannon(this);
+        cannon.setPosX(MvcGameConfig.INIT_CANNON_X);
+        cannon.setPosY(MvcGameConfig.INIT_CANNON_Y);
+        return cannon;
     }
 
     @Override
     public AbstractEnemy createEnemy() {
         int posY = r.nextInt(MvcGameConfig.MAX_Y);
-        int posX = this.model.getCannon().getPosX() * 2 + r.nextInt(MvcGameConfig.MAX_Y - (this.model.getCannon().getPosX() * 2));
+        int posX = MvcGameConfig.MAX_X / 4 + r.nextInt(3 * MvcGameConfig.MAX_X / 4) - 20;
         return new Enemy(posX, posY);
     }
 
@@ -40,12 +43,13 @@ public class GameObjectsFactory implements IGameObjectsFactory {
     @Override
     public AbstractMissile createMissile() {
         AbstractCannon cannon = this.model.getCannon();
-        return new Missile(cannon.getPosX(), cannon.getPosY());
+        return new Missile(cannon.getPosX(), cannon.getPosY(), cannon.getAngle(), cannon.getPower(),
+                this.activeMoveStrategy);
     }
 
     @Override
     public AbstractGameInfo createGameInfo() {
-        return new GameInfo();
+        return new GameInfo(this.model);
     }
 
     @Override
@@ -58,5 +62,13 @@ public class GameObjectsFactory implements IGameObjectsFactory {
     public void activateRealisticMoveStrategy() {
         this.activeMoveStrategy = new RealisticMoveStrategy();
         this.model.setMovingStrategy(this.activeMoveStrategy);
+    }
+
+    @Override
+    public void changeMoveStrategy() {
+        if(this.activeMoveStrategy instanceof SimpleMoveStrategy)
+            activateRealisticMoveStrategy();
+        else
+            activateSimpleMoveStrategy();
     }
 }

@@ -41,7 +41,6 @@ public class MvcGame
 
     public void render(IGameGraphics gr)
     {
-//        gr.drawImage(new Image("images/cannon.png"), logoPos.getX(), logoPos.getY());
         this.view.setGraphics(gr);
         this.view.render();
     }

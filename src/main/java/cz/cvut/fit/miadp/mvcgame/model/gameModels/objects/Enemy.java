@@ -6,4 +6,5 @@ public class Enemy extends AbstractEnemy {
     public Enemy(int x, int y) {
         super(x, y);
     }
+
 }

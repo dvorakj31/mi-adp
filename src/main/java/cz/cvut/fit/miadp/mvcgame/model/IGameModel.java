@@ -11,6 +11,10 @@ public interface IGameModel {
     void moveCannonUp();
     void moveCannonDown();
     void cannonShoot();
+    void cannonPowerDec();
+    void cannonPowerInc();
+    void cannonAimUp();
+    void cannonAimDown();
     void cannonToggleShootingMode();
 
     void registerObserver(IObserver obs);
@@ -28,4 +32,6 @@ public interface IGameModel {
     void timeTick();
 
     void executeCommands();
+
+    void changeMovingStrategy();
 }

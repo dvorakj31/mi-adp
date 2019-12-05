@@ -37,6 +37,26 @@ public class GameModelProxy implements IGameModel {
     }
 
     @Override
+    public void cannonPowerDec() {
+        this.model.cannonPowerDec();
+    }
+
+    @Override
+    public void cannonPowerInc() {
+        this.model.cannonPowerInc();
+    }
+
+    @Override
+    public void cannonAimUp() {
+        this.model.cannonAimUp();
+    }
+
+    @Override
+    public void cannonAimDown() {
+        this.model.cannonAimDown();
+    }
+
+    @Override
     public void cannonToggleShootingMode() {
         this.model.cannonToggleShootingMode();
     }
@@ -89,5 +109,10 @@ public class GameModelProxy implements IGameModel {
     @Override
     public void executeCommands() {
         this.model.executeCommands();
+    }
+
+    @Override
+    public void changeMovingStrategy() {
+        this.model.changeMovingStrategy();
     }
 }

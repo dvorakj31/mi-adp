@@ -3,7 +3,7 @@ package cz.cvut.fit.miadp.mvcgame.model;
 import cz.cvut.fit.miadp.mvcgame.visitor.IVisitable;
 import cz.cvut.fit.miadp.mvcgame.visitor.IVisitor;
 
-public abstract class GameObject implements IVisitable {
+public abstract class GameObject implements IVisitable, Cloneable {
     protected int posX;
     protected int posY;
 
@@ -25,5 +25,9 @@ public abstract class GameObject implements IVisitable {
 
     public void setPosY(int posY) {
         this.posY = posY;
+    }
+
+    public GameObject clone() throws CloneNotSupportedException {
+        return (GameObject)super.clone();
     }
 }

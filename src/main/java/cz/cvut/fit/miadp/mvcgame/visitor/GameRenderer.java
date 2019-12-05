@@ -47,7 +47,7 @@ public class GameRenderer implements IVisitor {
     }
 
     private void drawGameInfo(AbstractGameInfo info) {
-
+        this.graphics.drawText(info.getText(), info.getPos());
     }
 
     private void drawEnemy(AbstractEnemy enemy) {

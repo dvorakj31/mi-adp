@@ -11,4 +11,6 @@ public interface IGameObjectsFactory {
     AbstractGameInfo createGameInfo();
     void activateSimpleMoveStrategy();
     void activateRealisticMoveStrategy();
+
+    void changeMoveStrategy();
 }

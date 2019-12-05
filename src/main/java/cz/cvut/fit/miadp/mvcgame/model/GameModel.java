@@ -3,12 +3,15 @@ package cz.cvut.fit.miadp.mvcgame.model;
 import cz.cvut.fit.miadp.mvcgame.abstractFactory.GameObjectsFactory;
 import cz.cvut.fit.miadp.mvcgame.abstractFactory.IGameObjectsFactory;
 import cz.cvut.fit.miadp.mvcgame.command.AbstractGameCommand;
+import cz.cvut.fit.miadp.mvcgame.command.UndoCommand;
 import cz.cvut.fit.miadp.mvcgame.config.MvcGameConfig;
-import cz.cvut.fit.miadp.mvcgame.controller.GameController;
 import cz.cvut.fit.miadp.mvcgame.model.gameModels.*;
 import cz.cvut.fit.miadp.mvcgame.observer.IObservable;
 import cz.cvut.fit.miadp.mvcgame.observer.IObserver;
+import cz.cvut.fit.miadp.mvcgame.state.IShootingMode;
+import cz.cvut.fit.miadp.mvcgame.state.SimpleShootingMode;
 import cz.cvut.fit.miadp.mvcgame.strategy.IMovingStrategy;
+import cz.cvut.fit.miadp.mvcgame.strategy.RealisticMoveStrategy;
 import cz.cvut.fit.miadp.mvcgame.strategy.SimpleMoveStrategy;
 
 import java.util.*;
@@ -30,39 +33,30 @@ public class GameModel implements IObservable, IGameModel {
     private IGameObjectsFactory goFactory;
     private LinkedBlockingQueue<AbstractGameCommand> unexecutedCmds = new LinkedBlockingQueue<>();
     private Stack<AbstractGameCommand> executedCmds = new Stack<>();
-
-
-    public ArrayList<AbstractMissile> getMissiles() {
-        return this.missiles;
-    }
-
-    public ArrayList<AbstractEnemy> getEnemies() {
-        return this.enemies;
-    }
-
-    public ArrayList<AbstractCollision> getCollisions() {
-        return this.collisions;
-    }
+    private IShootingMode shootingMode;
 
     private class Memento {
+        private final AbstractGameInfo info;
         private int score;
         private AbstractCannon cannon;
         private ArrayList<AbstractEnemy> enemies;
         private IMovingStrategy strategy;
 
         Memento(int score, AbstractCannon cannon, ArrayList<AbstractEnemy> enemies,
-                IMovingStrategy strategy) {
+                IMovingStrategy strategy, AbstractGameInfo info) {
             this.score = score;
             this.cannon = cannon;
             this.enemies = enemies;
             this.strategy = strategy;
+            this.info = info;
         }
     }
 
     public GameModel() {
-
-        this.goFactory = new GameObjectsFactory(this);
         this.strategy = new SimpleMoveStrategy();
+        this.shootingMode = new SimpleShootingMode();
+        this.goFactory = new GameObjectsFactory(this);
+        this.info = goFactory.createGameInfo();
 
         initGame();
         initTimer();
@@ -97,31 +91,56 @@ public class GameModel implements IObservable, IGameModel {
         ret.addAll(this.enemies);
         ret.addAll(this.missiles);
         ret.addAll(this.collisions);
+        ret.add(this.info);
         return ret;
     }
 
     @Override
     public void moveCannonUp() {
-        this.cannon.setY(this.cannon.getPosY() - MvcGameConfig.MOVE_SPEED);
+        this.cannon.moveUp();
         this.notifyMyObservers();
     }
 
     @Override
     public void moveCannonDown() {
-        this.cannon.setY(this.cannon.getPosY() + MvcGameConfig.MOVE_SPEED);
+        this.cannon.moveDown();
         this.notifyMyObservers();
     }
 
     @Override
     public void cannonShoot() {
-        AbstractMissile missile = this.goFactory.createMissile();
-        this.missiles.add(missile);
+        this.missiles.addAll(this.cannon.shoot());
+        this.notifyMyObservers();
+    }
+
+    @Override
+    public void cannonPowerDec() {
+        this.cannon.decreasePower();
+        this.notifyMyObservers();
+    }
+
+    @Override
+    public void cannonPowerInc() {
+        this.cannon.increasePower();
+        this.notifyMyObservers();
+    }
+
+    @Override
+    public void cannonAimUp() {
+        this.cannon.aimUp();
+        this.notifyMyObservers();
+    }
+
+    @Override
+    public void cannonAimDown() {
+        this.cannon.aimDown();
         this.notifyMyObservers();
     }
 
     @Override
     public void cannonToggleShootingMode() {
-
+        this.shootingMode.nextMode(this.cannon);
+        this.notifyMyObservers();
     }
 
     @Override
@@ -151,7 +170,17 @@ public class GameModel implements IObservable, IGameModel {
 
     @Override
     public Object createMemento() {
-        return new Memento(this.score, this.cannon, this.enemies, this.strategy);
+        try {
+
+            ArrayList<AbstractEnemy> cloned_enemies = new ArrayList<>();
+            for(int i = 0; i < this.enemies.size(); i++)
+                cloned_enemies.add((AbstractEnemy)this.enemies.get(i).clone());
+            return new Memento(this.score, (AbstractCannon)this.cannon.clone(), cloned_enemies, this.strategy,
+                    (AbstractGameInfo)this.info.clone());
+        } catch(CloneNotSupportedException c) {
+            return null;
+        }
+
     }
 
     @Override
@@ -163,6 +192,8 @@ public class GameModel implements IObservable, IGameModel {
     public void undoLastCmd() {
         try {
             AbstractGameCommand cmd = this.executedCmds.pop();
+            if (cmd instanceof UndoCommand)
+                cmd = this.executedCmds.pop();
             cmd.unexecute();
         } catch (Exception e) {
 
@@ -176,8 +207,12 @@ public class GameModel implements IObservable, IGameModel {
 
     @Override
     public void timeTick() {
-        this.executeCommands();
-        this.moveGameObjects();
+        try {
+            this.executeCommands();
+            this.moveGameObjects();
+        } catch (Exception e) {
+
+        }
     }
 
     private void moveGameObjects() {
@@ -192,10 +227,11 @@ public class GameModel implements IObservable, IGameModel {
         ArrayList<AbstractMissile> collidedMissiles = new ArrayList<>();
         ArrayList<AbstractEnemy> collidedEnemies = new ArrayList<>();
         for(int i = 0; i < missiles.size(); i++) {
-            for (AbstractEnemy enemy : enemies) {
-                if (missiles.get(i).collide(enemy)) {
+            for (int j = 0; j < enemies.size(); j++) {
+                if (missiles.get(i).collide(enemies.get(j))) {
                     collidedMissiles.add(missiles.get(i));
-                    collidedEnemies.add(enemy);
+                    collidedEnemies.add(enemies.get(j));
+                    this.score++;
                 }
             }
         }
@@ -203,7 +239,6 @@ public class GameModel implements IObservable, IGameModel {
         for (AbstractEnemy enemy : collidedEnemies) {
             this.collisions.add(this.goFactory.createCollision(enemy.posX, enemy.posY));
         }
-
         missiles.removeAll(collidedMissiles);
         enemies.removeAll(collidedEnemies);
 
@@ -242,8 +277,26 @@ public class GameModel implements IObservable, IGameModel {
         }
     }
 
+    @Override
+    public void changeMovingStrategy() {
+        this.goFactory.changeMoveStrategy();
+        this.notifyMyObservers();
+    }
+
     public void setMovingStrategy(IMovingStrategy strategy) {
         this.strategy = strategy;
-        notifyMyObservers();
     }
+
+    public int getScore() {
+        return this.score;
+    }
+
+    public IShootingMode getShootingMode() {
+        return this.cannon.getShootingMode();
+    }
+
+    public float getPower() {
+        return this.cannon.getPower();
+    }
+
 }

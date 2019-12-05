@@ -46,21 +46,24 @@ public class MvcGameJavaFxLauncher extends Application {
         IGameGraphics gr = new GameGraphics(new JavaFxGraphics(gc));
 
         ArrayList<String> pressedKeysCodes = new ArrayList<String>();
- 
+
         theScene.setOnKeyPressed(
             new EventHandler<KeyEvent>()
             {
                 public void handle(KeyEvent e)
                 {
                     String code = e.getCode().toString();
- 
                     // only add once... prevent duplicates
-                    if ( !pressedKeysCodes.contains(code) )
-                        pressedKeysCodes.add( code );
+                    if (code.equals("UP") || code.equals("DOWN") || !pressedKeysCodes.contains(code) ) {
+                        ArrayList<String> codes = new ArrayList<>();
+                        codes.add(code);
+                        pressedKeysCodes.add(code);
+                        theMvcGame.processPressedKeys(codes);
+                    }
                 }
             }
         );
- 
+
         theScene.setOnKeyReleased(
             new EventHandler<KeyEvent>()
             {
@@ -78,9 +81,8 @@ public class MvcGameJavaFxLauncher extends Application {
             public void handle(long currentNanoTime)
             {
                 // Clear the canvas
-                 // gc.clearRect(0, 0, winWidth, winHeigth);
-
-                theMvcGame.processPressedKeys(pressedKeysCodes);
+                // gc.clearRect(0, 0, winWidth, winHeigth);
+//                theMvcGame.processPressedKeys(pressedKeysCodes);
                 theMvcGame.update();
                 theMvcGame.render(gr);
             }
